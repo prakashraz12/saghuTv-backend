@@ -5,17 +5,18 @@ const newsSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
-      index:true
+      index: true,
     },
-    thumbnailImage: {
+    bannerImage: {
       type: String,
       default: "",
     },
-    shortDescription: { // short description is just summerized part of news
+    shortDescription: {
+      // short description is just summerized part of news
       type: String,
       required: true,
       maxlength: 400,
-      index:true
+      index: true,
     },
     content: {
       type: String,
@@ -26,10 +27,18 @@ const newsSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    category: {
-      type: String,
-      required: true,
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
+      },
+    ],
+    tags: {
+      type: [String],
+      default: [],
     },
+    
     views: {
       type: Number,
       default: 0,
@@ -38,10 +47,14 @@ const newsSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    isHighlighted:{
-      type:Boolean,
-      default:false
-    }
+    isHighlighted: {
+      type: Boolean,
+      default: false,
+    },
+    sharingNumber: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

@@ -3,6 +3,7 @@ import {
   MAX_RECENT_NEWS,
   MAX_TRENDING_NEWS,
 } from "../constant.js";
+import { Category } from "../models/category.model.js";
 import { News } from "../models/news-post.model.js";
 
 //get all news
@@ -47,7 +48,11 @@ export const getHighlightedNews = async (req, res) => {
   try {
     const news = await News.find({ isPublished: true, isHighlighted: true })
       .sort({ createdAt: -1, updatedAt: -1 })
-      .limit(MAX_HIGHLIGHTED_NEWS);
+      .limit(MAX_HIGHLIGHTED_NEWS)
+      .populate({
+        path: "owner",
+        select: "fullName avatar",
+      });
 
     if (!news) {
       return res.status(404).json({ message: "News not found" });
@@ -100,7 +105,10 @@ export const getRecentNews = async (req, res) => {
 export const getNewsById = async (req, res) => {
   const { id } = req.params;
 
-  const news = await News.findById(id);
+  const news = await News.findById(id).populate({
+    path: "owner",
+    select: "fullName avatar",
+  });
 
   if (!news) {
     return res.status(404).json({ message: "News Not found" });
@@ -130,7 +138,7 @@ export const searchNews = async (req, res) => {
       return res.status(404).json({ message: "News not found" });
     }
 
-    return res.status(200).json(new ApiResponse(200, news));
+    return res.status(200).json({message:"News fetched by title", news});
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -139,13 +147,17 @@ export const searchNews = async (req, res) => {
 //get news by category;
 export const getNewsBycategory = async (req, res) => {
   try {
-    const { category } = req.query;
+    const { cat } = req.query;
+    console.log(cat);
 
-    if (!category) {
+    if (!cat) {
       return null;
     }
 
-    const news = await News.find({ isPublished: true, category: category });
+    const news = await News.find({
+      isPublished: true,
+      categories: cat,
+    }).limit(20);
 
     if (!news) {
       return res.status(404).json({ message: "News not found" });

@@ -6,6 +6,16 @@ const menuSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
+
+    menuOrder: {
+      type: Number,
+      required: true,
+      unique: true,
+    },
+    categoryId: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    }],
   },
   { timestamps: true }
 );

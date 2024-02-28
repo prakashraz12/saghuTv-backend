@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    fullName: {
+    reporterFullName: {
       type: String,
       required: true,
       trim: true,
@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "editor",
     },
+    department:{
+      type: String,
+      default:""
+    }
   },
   {
     timestamps: true,

@@ -1,5 +1,3 @@
-import { ApiError } from "../utils/ApiError.util.js";
-import { asyncHandler } from "../utils/asyncHandler.util.js";
 import { tokenVerify } from "../utils/token-verify.js";
 
 export const authUser = async (req, res, next) => {
@@ -17,7 +15,7 @@ export const authUser = async (req, res, next) => {
     }
 
     const decodedToken = await tokenVerify(token);
-
+console.log(decodedToken);
     if (decodedToken.id) {
       //
       req.user = decodedToken.id;

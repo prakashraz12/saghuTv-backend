@@ -7,10 +7,18 @@ import { emailValidator, passwordValidator } from "../utils/validator.util.js";
 
 //create user
 export const createUser = async (req, res) => {
-  const { fullName, avatar, email, password, role } = req.body;
+  const {
+    reporterFullName,
+    avatar,
+    email,
+    password,
+    role,
+    department,
+    discription,
+  } = req.body;
 
   try {
-    if (!fullName || !email || !password) {
+    if (!reporterFullName || !email || !password) {
       return res
         .status(400)
         .json({ message: "fullname, email, password are required" });
@@ -30,17 +38,21 @@ export const createUser = async (req, res) => {
     const existingUser = await User.findOne({ email: email });
 
     if (existingUser) {
-      return res.status(400).json({ message: "User already in the database" });
+      return res
+        .status(400)
+        .json({ message: "User email already in the database" });
     }
 
     const saltPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
-      fullName,
+      reporterFullName,
       avatar,
       email,
       password: saltPassword,
       role,
+      discription: discription,
+      department: department,
     });
 
     return res
@@ -165,5 +177,19 @@ export const changePassword = async (req, res) => {
     return res.status(200).json({ message: "Password update successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const currentUserId = req.user;
+
+    const users = await User.find({ _id: { $ne: currentUserId } });
+    if (!users) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({message:"Users list fetched", users });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
