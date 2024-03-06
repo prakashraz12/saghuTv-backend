@@ -34,11 +34,22 @@ const newsSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    recommendedNews:[
+      {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"News"
+      }
+    ],
+    menu: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Menu",
+      required: true,
+    },
     tags: {
       type: [String],
       default: [],
     },
-    
+
     views: {
       type: Number,
       default: 0,

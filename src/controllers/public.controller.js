@@ -104,19 +104,34 @@ export const getRecentNews = async (req, res) => {
 //get news by id
 export const getNewsById = async (req, res) => {
   const { id } = req.params;
+  const incVlaue = 1;
 
-  const news = await News.findById(id).populate({
-    path: "owner",
-    select: "fullName avatar",
-  });
-
-  if (!news) {
-    return res.status(404).json({ message: "News Not found" });
+  try {
+    const news = await News.findByIdAndUpdate(
+      { _id: id },
+      { isPublished: true },
+      { $inc: { views: incVlaue } }
+    )
+      .populate({
+        path: "owner",
+        select: "fullName avatar",
+      })
+      .populate({
+        path: "recommendedNews",
+        select: "title shortDescription bannerImage",
+      });
+      
+    if (!news) {
+      return res.status(404).json({ message: "News Not found" });
+    }
+  
+    return res
+      .status(200)
+      .json({ news, message: "Successfully news fetched by id" });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({message:error.message})
   }
-
-  return res
-    .status(200)
-    .json({ news, message: "Successfully news fetched by id" });
 };
 
 //news menus
@@ -138,7 +153,7 @@ export const searchNews = async (req, res) => {
       return res.status(404).json({ message: "News not found" });
     }
 
-    return res.status(200).json({message:"News fetched by title", news});
+    return res.status(200).json({ message: "News fetched by title", news });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -148,7 +163,6 @@ export const searchNews = async (req, res) => {
 export const getNewsBycategory = async (req, res) => {
   try {
     const { cat } = req.query;
-    console.log(cat);
 
     if (!cat) {
       return null;
@@ -158,6 +172,44 @@ export const getNewsBycategory = async (req, res) => {
       isPublished: true,
       categories: cat,
     }).limit(20);
+
+    if (!news) {
+      return res.status(404).json({ message: "News not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ news, message: "News fetched by category successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+//get news by menu
+export const getNewsByMenu = async (req, res) => {
+  try {
+    let { me, limit, page } = req.query;
+
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+
+    if (!me) {
+      return null;
+    }
+
+    const news = await News.find({
+      isPublished: true,
+      menu: me,
+    })
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: "owner",
+        select: "fullName avatar",
+      })
+      .sort({ createdAt: -1 });
 
     if (!news) {
       return res.status(404).json({ message: "News not found" });

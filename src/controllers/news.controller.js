@@ -12,6 +12,8 @@ export const createNews = async (req, res) => {
     isPublished,
     tags,
     bannerImage,
+    menu,
+    recommendedNews,
   } = req.body;
 
   try {
@@ -33,11 +35,13 @@ export const createNews = async (req, res) => {
       sharingNumber,
       tags,
       bannerImage,
+      menu,
+      recommendedNews,
     });
 
     return res
       .status(201)
-      .json({message:"News created successfully", newNews});
+      .json({ message: "News created successfully", newNews });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -50,10 +54,10 @@ export const updateNews = async (req, res) => {
     content,
     isHighlighted,
     isPublished,
-    category,
+    categories,
     shortDescription,
     sharingNumber,
-    thumbnailImage, // Add thumbnailImage to the destructuring assignment
+    thumbnailImage,
   } = req.body;
   const { id } = req.params;
 
@@ -65,18 +69,20 @@ export const updateNews = async (req, res) => {
       !isHighlighted ||
       !isPublished ||
       !shortDescription ||
-      !category
+      !categories
     ) {
-      throw new ApiError(
-        400,
-        "title, content, isHighlighted, isPublished, short description, and category are required"
-      );
+      return res
+        .status(400)
+        .json({
+          message:
+            "title, content, isHighlighted, isPublished, short description, and category are required",
+        });
     }
 
     const findNews = await News.findById(id);
 
     if (!findNews) {
-      throw new ApiError(404, "News not found");
+      return res.status(404).json({ message: "News not found" });
     }
 
     if (
@@ -92,16 +98,17 @@ export const updateNews = async (req, res) => {
     findNews.content = content;
     findNews.isPublished = isPublished;
     findNews.shortDescription = shortDescription;
-    findNews.thumbnailImage = thumbnailImage; // Assign thumbnailImage
-    findNews.category = category;
+    findNews.thumbnailImage = thumbnailImage;
+    findNews.categories = categories;
+    findNews.sharingNumber = sharingNumber;
+    findNews.isHighlighted = isHighlighted;
 
     await findNews.save();
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, "News updated successfully"));
+    return res.status(200).json({ message: "News updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error)
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -111,29 +118,55 @@ export const deleteNews = async (req, res) => {
 
   try {
     if (!id) {
-      throw new ApiError(400, "News ID is required");
+      return res.status(400).json({ message: "News id is required" });
     }
 
     const findNews = await News.findById(id);
 
     if (!findNews) {
-      throw new ApiError(404, "News not found");
+      return res.status(404).json({ message: "News not found" });
     }
 
     if (
       req.role !== "admin" &&
       findNews.owner.toString() !== req.user.toString()
     ) {
-      throw new ApiError(403, "Not authorized to delete this news");
+      return res
+        .status(403)
+        .json({ message: "You are not authorised person to delete this news" });
     }
 
     await News.findByIdAndDelete(id);
 
-    return res.status(200).json(new ApiResponse(200, "News post deleted"));
+    return res.status(200).json({ message: "News post deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+export const getAllNews = async (req, res) => {
+  const { page, limit } = req.query;
 
+  try {
+    const news = await News.find()
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate({
+        path: "owner",
+        select: "fullName",
+      })
+      .sort({ createdAt: -1 });
 
+    res.status(200).json({
+      success: true,
+      data: news,
+      page: page,
+      totalPages: Math.ceil((await News.countDocuments()) / limit),
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
+};

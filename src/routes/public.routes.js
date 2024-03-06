@@ -3,7 +3,9 @@ import {
   getAllNews,
   getHighlightedNews,
   getNewsById,
+  getNewsByMenu,
   getNewsBycategory,
+  getRecentNews,
   searchNews,
 } from "../controllers/public.controller.js";
 
@@ -23,5 +25,13 @@ router.get("/search-category", getNewsBycategory);
 
 //routes to get news by id
 router.get("/news/:id", getNewsById);
+
+//routes to get recent news
+router.get("/get-recent-news", getRecentNews);
+
+//routes to get menuById's
+
+router.get("/get-by-menu", getNewsByMenu)
+
 
 export default router;

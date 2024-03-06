@@ -8,7 +8,7 @@ import { emailValidator, passwordValidator } from "../utils/validator.util.js";
 //create user
 export const createUser = async (req, res) => {
   const {
-    reporterFullName,
+    fullName,
     avatar,
     email,
     password,
@@ -46,7 +46,7 @@ export const createUser = async (req, res) => {
     const saltPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
-      reporterFullName,
+      fullName,
       avatar,
       email,
       password: saltPassword,

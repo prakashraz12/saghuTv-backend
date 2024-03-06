@@ -1,20 +1,20 @@
-import { Menu } from "../models/menu.model";
+import { Menu } from "../models/menu.model.js";
 
 // Create menu item
 export const createMenu = async (req, res) => {
-  const { name, menuOrder, categoryId } = req.body;
+  const { menuName, menuOrder, categories } = req.body;
 
   try {
-    if (!name || !menuOrder || !categoryId) {
+    if (!menuName || !menuOrder) {
       return res
         .status(400)
-        .json({ message: "Name, menuOrder, and categoryId are required" });
+        .json({ message: "Name, menuOrder,  are required" });
     }
 
     const newMenu = await Menu.create({
-      name,
+      menuName,
       menuOrder,
-      categoryId,
+      categories,
     });
 
     return res
@@ -68,6 +68,22 @@ export const deleteMenu = async (req, res) => {
     return res
       .status(200)
       .json({ message: "Menu item deleted successfully", deletedMenu });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllMenus = async (req, res) => {
+  try {
+    const menus = await Menu.find().sort({ orderMenu: 1 });
+    console.log(menus);
+    if (!menus || menus.length === 0) {
+      return res.status(404).json({ message: "Menu not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Menu list fetched successfully", menus });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

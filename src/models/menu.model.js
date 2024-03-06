@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const menuSchema = new mongoose.Schema(
   {
-    name: {
+    menuName: {
       type: String,
       require: true,
     },
@@ -12,7 +12,7 @@ const menuSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    categoryId: [{
+    categories: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     }],
