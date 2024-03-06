@@ -18,7 +18,7 @@ export const createUser = async (req, res) => {
   } = req.body;
 
   try {
-    if (!reporterFullName || !email || !password) {
+    if (!fullName || !email || !password) {
       return res
         .status(400)
         .json({ message: "fullname, email, password are required" });
