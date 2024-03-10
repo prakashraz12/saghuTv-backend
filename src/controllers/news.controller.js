@@ -1,4 +1,5 @@
 import { News } from "../models/news-post.model.js";
+import { User } from "../models/user.model.js";
 
 // Create news
 export const createNews = async (req, res) => {
@@ -39,6 +40,13 @@ export const createNews = async (req, res) => {
       recommendedNews,
     });
 
+    // Update user's news array
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { news: newNews._id } },
+      { new: true }
+    );
+
     return res
       .status(201)
       .json({ message: "News created successfully", newNews });
@@ -58,6 +66,9 @@ export const updateNews = async (req, res) => {
     shortDescription,
     sharingNumber,
     thumbnailImage,
+    recommendedNews,
+    tags,
+    menu
   } = req.body;
   const { id } = req.params;
 
@@ -71,12 +82,10 @@ export const updateNews = async (req, res) => {
       !shortDescription ||
       !categories
     ) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "title, content, isHighlighted, isPublished, short description, and category are required",
-        });
+      return res.status(400).json({
+        message:
+          "title, content, isHighlighted, isPublished, short description, and category are required",
+      });
     }
 
     const findNews = await News.findById(id);
@@ -102,12 +111,15 @@ export const updateNews = async (req, res) => {
     findNews.categories = categories;
     findNews.sharingNumber = sharingNumber;
     findNews.isHighlighted = isHighlighted;
+    findNews.menu = menu;
+    findNews.recommendedNews = recommendedNews;
+    findNews.tags = tags
 
     await findNews.save();
 
     return res.status(200).json({ message: "News updated successfully" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({ message: error.message });
   }
 };

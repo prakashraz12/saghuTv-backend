@@ -27,7 +27,20 @@ const userSchema = new mongoose.Schema(
     department:{
       type: String,
       default:""
-    }
+    },
+    phone:{
+      type:Number,
+      default:0
+    },
+    about:{
+      type:String,default:""
+    },
+    news:[
+      {
+        type:mongoose.Types.ObjectId,
+        ref:"News"
+      }
+    ]
   },
   {
     timestamps: true,

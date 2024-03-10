@@ -22,9 +22,31 @@ export const createCategory = async (req, res) => {
   }
 };
 
+
+
+//get categoryBy id;
+export const getCategoryById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "Category not found" });
+    }
+
+    const category = await Category.findById(id);
+
+    if (!category) {
+      return res.status(400).json({ message: "Category not found" });
+    }
+
+    res.status(200).json({message:'category fetched', category})
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 // Update category
 export const updateCategory = async (req, res) => {
   const { categoryName, categoryDescription, id } = req.body;
+  console.log(id)
 
   try {
     if (!categoryName) {
@@ -70,8 +92,6 @@ export const deleteCategory = async (req, res) => {
 
 //get list of category
 export const getListOfCategory = async (req, res) => {
-
-
   try {
     const list = await Category.find();
 

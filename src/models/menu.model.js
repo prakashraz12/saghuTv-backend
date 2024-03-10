@@ -5,6 +5,7 @@ const menuSchema = new mongoose.Schema(
     menuName: {
       type: String,
       require: true,
+      unique: true,
     },
 
     menuOrder: {
@@ -12,10 +13,12 @@ const menuSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    categories: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-    }],
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
   },
   { timestamps: true }
 );

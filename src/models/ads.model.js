@@ -2,10 +2,7 @@ import mongoose from "mongoose";
 
 const adSchema = new mongoose.Schema(
   {
-    type: {
-      type: String,
-      required: true,
-    },
+ 
     imageUrl: {
       type: String,
       required: true,
@@ -14,6 +11,10 @@ const adSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    adsLink:{
+      type:String,
+      required:true
+    }
   },
   { timestamps: true }
 );

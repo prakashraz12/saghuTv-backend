@@ -10,6 +10,7 @@ export const authUser = async (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
     // Check if the token is missing
+    console.log(token)
     if (!token) {
       return res.status(401).json({ message: "Please login first" });
     }

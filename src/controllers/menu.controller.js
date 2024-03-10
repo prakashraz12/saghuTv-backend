@@ -11,6 +11,11 @@ export const createMenu = async (req, res) => {
         .json({ message: "Name, menuOrder,  are required" });
     }
 
+    const findMenu = await Menu.findOne({ menuName: menuName });
+    if (findMenu) {
+      return res.status(409).json({ message: "Menu already in database" });
+    }
+
     const newMenu = await Menu.create({
       menuName,
       menuOrder,
@@ -27,10 +32,10 @@ export const createMenu = async (req, res) => {
 
 // Update menu item
 export const updateMenu = async (req, res) => {
-  const { name, menuOrder, categoryId, id } = req.body;
+  const { menuName, menuOrder, categories, id } = req.body;
 
   try {
-    if (!name || !menuOrder || !categoryId) {
+    if (!menuName || !menuOrder) {
       return res
         .status(400)
         .json({ message: "Name, menuOrder, and categoryId are required" });
@@ -38,7 +43,7 @@ export const updateMenu = async (req, res) => {
 
     const updatedMenu = await Menu.findByIdAndUpdate(
       id,
-      { name, menuOrder, categoryId },
+      { menuName, menuOrder, categories },
       { new: true }
     );
 
@@ -84,6 +89,21 @@ export const getAllMenus = async (req, res) => {
     return res
       .status(200)
       .json({ message: "Menu list fetched successfully", menus });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getMenuById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const findMenu = await Menu.findById(id);
+
+    if (!findMenu) {
+      return res.status(500).json({ message: "Menu not found" });
+    }
+
+    res.status(200).json(findMenu);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
