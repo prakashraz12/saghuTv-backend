@@ -1,3 +1,6 @@
+
+// #!/usr/bin / env node
+
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
 import { app } from "./_app.js";
