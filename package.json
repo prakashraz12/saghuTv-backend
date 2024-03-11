@@ -5,12 +5,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "prakash shrestha",
   "license": "ISC",
   "bin": {
-    "execute": "index.js"
+    "execute": "src/index.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
