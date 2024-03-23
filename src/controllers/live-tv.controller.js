@@ -3,14 +3,14 @@ import { LiveTv } from "../models/live-tv.model.js";
 export const createLiveTv = async (req, res) => {
   try {
     const { liveTvTitle, liveTvVideoLink, isLive, description } = req.body;
-    const newLiveTv = new LiveTv({
+    const newLiveTv = await LiveTv.create({
       liveTvTitle,
       liveTvVideoLink,
       isLive,
       description,
     });
-    const savedLiveTv = await newLiveTv.save();
-    res.status(201).json(savedLiveTv);
+
+    res.status(201).json(newLiveTv);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -64,4 +64,19 @@ export const deleteLiveTv = async (req, res) => {
     await LiveTv.findOneAndDelete(id);
     res.status(200).json({ message: "Live tv deleted" });
   } catch (error) {}
+};
+
+export const liveTv = async (req, res) => {
+  try {
+    const findLiveTv = await LiveTv.find({ isLive: true }).sort({
+      createdAt:-1
+    });
+    if (!findLiveTv?.length === 0) {
+      return res.status(404).json({ message: "Livetv not found" });
+    }
+    console.log(findLiveTv)
+    res.status(200).json(findLiveTv[0]);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

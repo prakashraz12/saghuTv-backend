@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authUser } from "../middleware/auth.middleware.js";
 import { authorizationUser } from "../middleware/authorization.middleware.js";
-import { createLiveTv, deleteLiveTv, getAllLiveTv, getLiveTvById, updateLiveTv } from "../controllers/live-tv.controller.js";
+import { createLiveTv, deleteLiveTv, getAllLiveTv, getLiveTvById, liveTv, updateLiveTv } from "../controllers/live-tv.controller.js";
 
 
 const router = Router();
@@ -20,7 +20,10 @@ router.get("/get-all", authUser, authorizationUser(["admin"]), getAllLiveTv );
 router.delete("/delete/:id", authUser, authorizationUser(["admin"]), deleteLiveTv );
 
 //roputer to get live-tv by id;
-router.get("/get/:id", authUser, authorizationUser(["admin"]), getLiveTvById );
+router.get("/get/:id", authUser, authorizationUser(["admin"]), getLiveTvById);
+
+//routes to get live-tv
+router.get("/live",liveTv )
 
 
 

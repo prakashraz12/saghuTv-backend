@@ -31,6 +31,6 @@ app.use("/api/v1/menu", menuRoute);
 app.use("/api/v1/admin-dashboard", adminDashboard);
 app.use("/api/v1/ads", ads);
 app.use("/api/v1/live-tv", liveTv);
-app.use("/api/v1/short-tv", shortTv);
+app.use("/api/v1/short", shortTv);
 
 export { app };

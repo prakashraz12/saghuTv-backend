@@ -40,12 +40,13 @@ export const deleteAd = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deletedAd = await Ads.findByIdAndRemove(id);
+    const deletedAd = await Ads.findByIdAndDelete(id);
     if (!deletedAd) {
       return res.status(404).json({ error: "Ad not found" });
     }
-    return res.status(204).end();
+    return res.status(200).json({ message: "deleted" });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: "Error deleting ad" });
   }
 };
@@ -65,5 +66,20 @@ export const getAdsByPosition = async (req, res) => {
     res.status(200).json({ message: "ads fetched successfully", ads });
   } catch (error) {
     return res.status(500).json({ error: "Error deleting ad" });
+  }
+};
+
+export const multipleAdsGet = async (req, res) => {
+  try {
+    const { positions } = req.body;
+    const findAds = await Ads.find({ position: { $in: positions } }); // Using $in operator for handle aray of input
+
+    if (findAds.length === 0) {
+      return res.status(404).json({ message: "Ads not found" });
+    }
+
+    return res.status(200).json({ ads: findAds });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };

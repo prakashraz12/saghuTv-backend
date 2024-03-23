@@ -2,7 +2,14 @@ import { Router } from "express";
 
 import { authUser } from "../middleware/auth.middleware.js";
 import { authorizationUser } from "../middleware/authorization.middleware.js";
-import { createAd, deleteAd, getAdsByPosition, getAllAds, updateAd } from "../controllers/ads.controller.js";
+import {
+  createAd,
+  deleteAd,
+  getAdsByPosition,
+  getAllAds,
+  multipleAdsGet,
+  updateAd,
+} from "../controllers/ads.controller.js";
 
 const router = Router();
 
@@ -19,11 +26,12 @@ router.put("/update", authUser, authorizationUser(["admin"]), updateAd);
 router.get("/getAll", getAllAds);
 
 //routes to delete ads
-router.delete("/delete/:id", authUser, authorizationUser(["admin"]), deleteAd)
-
+router.delete("/delete/:id", authUser, authorizationUser(["admin"]), deleteAd);
 
 //routes to getAdsByPosition
 router.get("/get-by-position", getAdsByPosition);
 
+//routes to get ads by posiotion of array
+router.post("/get/ads", multipleAdsGet);
 
 export default router;
