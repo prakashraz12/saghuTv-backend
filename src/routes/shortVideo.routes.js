@@ -22,8 +22,6 @@ router.post(
 //'routes to get all
 router.get(
   "/get-all",
-  authUser,
-  authorizationUser(["admin"]),
   getAllShortVideos
 );
 
