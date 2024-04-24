@@ -66,6 +66,14 @@ const newsSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    province: {
+      type: Number,
+      default:0
+    },
+    isShowOnProvince: {
+      type: Boolean,
+      default:false
+    }
   },
   { timestamps: true }
 );

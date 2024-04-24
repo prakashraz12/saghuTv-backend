@@ -15,6 +15,8 @@ export const createNews = async (req, res) => {
     bannerImage,
     menu,
     recommendedNews,
+    isShowOnProvince,
+    province,
   } = req.body;
 
   try {
@@ -38,6 +40,8 @@ export const createNews = async (req, res) => {
       bannerImage,
       menu,
       recommendedNews,
+      isShowOnProvince,
+      province,
     });
 
     // Update user's news array
@@ -68,7 +72,7 @@ export const updateNews = async (req, res) => {
     thumbnailImage,
     recommendedNews,
     tags,
-    menu
+    menu,
   } = req.body;
   const { id } = req.params;
 
@@ -113,7 +117,7 @@ export const updateNews = async (req, res) => {
     findNews.isHighlighted = isHighlighted;
     findNews.menu = menu;
     findNews.recommendedNews = recommendedNews;
-    findNews.tags = tags
+    findNews.tags = tags;
 
     await findNews.save();
 
@@ -176,9 +180,86 @@ export const getAllNews = async (req, res) => {
       totalPages: Math.ceil((await News.countDocuments()) / limit),
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       error: "Internal Server Error",
     });
+  }
+};
+
+export const getProvinceNews = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1; 
+    const limit = parseInt(req.query.limit) || 10;
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const totalNews = await News.countDocuments({ isShowOnProvince: true });
+
+    const news = await News.find({ isShowOnProvince: true })
+      .sort({ createdAt: -1 })
+      .skip(startIndex)
+      .limit(limit);
+
+    if (!news || news.length === 0) {
+      return res.status(404).json({ message: "News not found" });
+    }
+
+    const pagination = {};
+    if (endIndex < totalNews) {
+      pagination.next = {
+        page: page + 1,
+        limit: limit,
+      };
+    }
+
+    if (startIndex > 0) {
+      pagination.prev = {
+        page: page - 1,
+        limit: limit,
+      };
+    }
+
+    res.status(200).json({ news, pagination });
+  } catch (error) {
+    res.status(500).json({ message: error?.message });
+  }
+};
+
+
+export const getProvinceNewsByProvinceNumber = async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Current page number, default is 1
+  const limit = parseInt(req.query.limit) || 10; // Number of items per page, default is 10
+  const province = req.query.province;
+
+  try {
+    const count = await News.countDocuments({ isShowOnProvince: true });
+    const totalPages = Math.ceil(count / limit);
+
+    // Validate current page
+    if (page < 1 || page > totalPages) {
+      return res.status(400).json({ message: "Invalid page number" });
+    }
+
+    const skip = (page - 1) * limit; // Calculate number of documents to skip
+
+    // Find news items based on pagination options
+    const news = await News.find({ isShowOnProvince: true, province })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    if (!news) {
+      return res.status(500).json({ message: "news not found" });
+    }
+    res.status(200).json({
+      currentPage: page,
+      totalPages: totalPages,
+      totalItems: count,
+      news: news,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
