@@ -69,10 +69,12 @@ export const updateNews = async (req, res) => {
     categories,
     shortDescription,
     sharingNumber,
-    thumbnailImage,
+    bannerImage,
     recommendedNews,
     tags,
     menu,
+    province,
+    isShowOnProvince
   } = req.body;
   const { id } = req.params;
 
@@ -81,7 +83,6 @@ export const updateNews = async (req, res) => {
       !title ||
       !content ||
       !id ||
-      !isHighlighted ||
       !isPublished ||
       !shortDescription ||
       !categories
@@ -111,13 +112,15 @@ export const updateNews = async (req, res) => {
     findNews.content = content;
     findNews.isPublished = isPublished;
     findNews.shortDescription = shortDescription;
-    findNews.thumbnailImage = thumbnailImage;
+    findNews.bannerImage = bannerImage;
     findNews.categories = categories;
     findNews.sharingNumber = sharingNumber;
     findNews.isHighlighted = isHighlighted;
     findNews.menu = menu;
     findNews.recommendedNews = recommendedNews;
     findNews.tags = tags;
+    findNews.province = province;
+    findNews.isShowOnProvince = isShowOnProvince
 
     await findNews.save();
 
@@ -149,22 +152,28 @@ export const deleteNews = async (req, res) => {
     ) {
       return res
         .status(403)
-        .json({ message: "You are not authorised person to delete this news" });
+        .json({ message: "You are not authorized to delete this news" });
     }
 
     await News.findByIdAndDelete(id);
 
     return res.status(200).json({ message: "News post deleted" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
 export const getAllNews = async (req, res) => {
-  const { page, limit } = req.query;
+  const { page, limit, search } = req.query;
 
   try {
-    const news = await News.find()
+    let query = {};
+
+    if (search && search.length > 0) {
+      query = { title: { $regex: search, $options: 'i' } };
+    }
+
+    const news = await News.find(query)
       .skip((page - 1) * limit)
       .limit(limit)
       .populate({
@@ -177,7 +186,7 @@ export const getAllNews = async (req, res) => {
       success: true,
       data: news,
       page: page,
-      totalPages: Math.ceil((await News.countDocuments()) / limit),
+      totalPages: Math.ceil((await News.countDocuments(query)) / limit),
     });
   } catch (error) {
     res.status(500).json({
@@ -185,6 +194,7 @@ export const getAllNews = async (req, res) => {
     });
   }
 };
+
 
 export const getProvinceNews = async (req, res) => {
   try {

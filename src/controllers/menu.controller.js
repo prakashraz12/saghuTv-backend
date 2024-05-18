@@ -34,6 +34,7 @@ export const createMenu = async (req, res) => {
 export const updateMenu = async (req, res) => {
   const { menuName, menuOrder, categories, id } = req.body;
 
+
   try {
     if (!menuName || !menuOrder) {
       return res

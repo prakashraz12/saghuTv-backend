@@ -88,6 +88,7 @@ export const loginUser = async (req, res) => {
       email: findUser.email,
       avatar: findUser.avatar,
       id: findUser._id,
+      role: findUser.role,
     };
 
     return res
@@ -145,13 +146,15 @@ export const changePassword = async (req, res) => {
     const userId = req.user;
     const role = req.role;
 
-    if (role !== "admin" && findUser._id !== userId) {
-      return res.status(403).json({ message: "You are not authorized person" });
+    const findUser = await User.findById(id);
+    const stringyFyFindUserId = findUser?._id.toString();
+
+    if (!findUser) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const findUser = await User.findById(id);
-    if (!findUser) {
-      return res.status(404).json({ message: "User  not found" });
+    if (role !== "admin" && stringyFyFindUserId !== userId) {
+      return res.status(403).json({ message: "You are not authorized person" });
     }
 
     const compareOldPassword = await bcrypt.compare(
@@ -166,7 +169,7 @@ export const changePassword = async (req, res) => {
     if (!passwordValidator(newPassword)) {
       return res.status(400).json({
         message:
-          "Password must be 6 char long and special charater and uppercase included",
+          "Password must be 6 characters long and include special characters and uppercase letters",
       });
     }
 
@@ -174,13 +177,14 @@ export const changePassword = async (req, res) => {
 
     findUser.password = saltedNewPassword;
 
-    findUser.save();
+    await findUser.save();
 
-    return res.status(200).json({ message: "Password update successfully" });
+    return res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -201,7 +205,7 @@ export const getMe = async (req, res) => {
 
   try {
     const getUserProfile = await User.findById(id)
-      .select("fullName avatar email phone department")
+      .select("fullName avatar email phone department about role")
       .populate({
         path: "news",
         options: {

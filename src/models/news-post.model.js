@@ -15,7 +15,6 @@ const newsSchema = new mongoose.Schema(
       // short description is just summerized part of news
       type: String,
       required: true,
-      maxlength: 400,
       index: true,
     },
     content: {

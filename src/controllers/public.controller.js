@@ -8,11 +8,14 @@ import { News } from "../models/news-post.model.js";
 
 //get all news
 export const getAllNews = async (req, res) => {
-  let { page, limit } = req.query;
-
+  let { page, limit, search } = req.query;
+  console.log(search);
   try {
     page = parseInt(page);
     limit = parseInt(limit);
+    // if (search) {
+      
+    // }
 
     const skip = (page - 1) * limit;
 
